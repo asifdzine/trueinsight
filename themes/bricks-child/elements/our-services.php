@@ -75,6 +75,18 @@ class Element_Our_Services extends \Bricks\Element
           'type'        => 'text',
           'default'     => esc_html__('Service Title', 'bricks'),
         ],
+        'subtitle' => [
+          'label'       => esc_html__('Service Subtitle', 'bricks'),
+          'type'        => 'text',
+          'default'     => '',
+          'description' => esc_html__('Small text that appears under the service title', 'bricks'),
+        ],
+        'description' => [
+          'label'       => esc_html__('Service Description', 'bricks'),
+          'type'        => 'textarea',
+          'default'     => '',
+          'description' => esc_html__('Description that appears under the image when service is clicked', 'bricks'),
+        ],
         'image' => [
           'label'       => esc_html__('Service Image', 'bricks'),
           'type'        => 'image',
@@ -157,6 +169,58 @@ class Element_Our_Services extends \Bricks\Element
       ],
     ];
 
+    $this->controls['serviceSubtitleTypography'] = [
+      'tab'     => 'style',
+      'group'   => 'services',
+      'label'   => esc_html__('Subtitle Typography', 'bricks'),
+      'type'    => 'typography',
+      'css'     => [
+        [
+          'property' => 'typography',
+          'selector' => '.service-subtitle',
+        ],
+      ],
+    ];
+
+    $this->controls['serviceDescriptionTypography'] = [
+      'tab'     => 'style',
+      'group'   => 'services',
+      'label'   => esc_html__('Description Typography', 'bricks'),
+      'type'    => 'typography',
+      'css'     => [
+        [
+          'property' => 'typography',
+          'selector' => '.service-description',
+        ],
+      ],
+    ];
+
+    $this->controls['serviceDescriptionPadding'] = [
+      'tab'     => 'style',
+      'group'   => 'services',
+      'label'   => esc_html__('Description Padding', 'bricks'),
+      'type'    => 'spacing',
+      'css'     => [
+        [
+          'property' => 'padding',
+          'selector' => '.service-description',
+        ],
+      ],
+    ];
+
+    $this->controls['serviceDescriptionBackground'] = [
+      'tab'     => 'style',
+      'group'   => 'services',
+      'label'   => esc_html__('Description Background', 'bricks'),
+      'type'    => 'color',
+      'css'     => [
+        [
+          'property' => 'background-color',
+          'selector' => '.service-description',
+        ],
+      ],
+    ];
+
     // Layout
     $this->controls['layoutGap'] = [
       'tab'     => 'style',
@@ -170,6 +234,15 @@ class Element_Our_Services extends \Bricks\Element
           'selector' => '.our-services-wrapper',
         ],
       ],
+    ];
+
+    $this->controls['flipLayout'] = [
+      'tab'         => 'style',
+      'group'       => 'layout',
+      'label'       => esc_html__('Flip Layout', 'bricks'),
+      'type'        => 'checkbox',
+      'default'     => false,
+      'description' => esc_html__('If enabled, image will be on the right and services list on the left (desktop only)', 'bricks'),
     ];
 
     $this->controls['imageWidth'] = [
@@ -218,6 +291,7 @@ class Element_Our_Services extends \Bricks\Element
     $heading  = ! empty($settings['heading']) ? $settings['heading'] : '';
     $services = ! empty($settings['services']) ? $settings['services'] : [];
     $default_image = ! empty($settings['defaultImage']) ? $settings['defaultImage'] : '';
+    $flip_layout = isset($settings['flipLayout']) ? $settings['flipLayout'] : false;
 
     // Return element placeholder if no services
     if (empty($services) || ! is_array($services) || count($services) === 0) {
@@ -283,9 +357,17 @@ class Element_Our_Services extends \Bricks\Element
       if (! in_array('our-services-wrapper', $existing_classes)) {
         $existing_classes[] = 'our-services-wrapper';
       }
+      // Add flip layout class if enabled
+      if ($flip_layout && ! in_array('layout-flipped', $existing_classes)) {
+        $existing_classes[] = 'layout-flipped';
+      }
       $this->attributes['_root']['class'] = $existing_classes;
     } else {
-      $this->set_attribute('_root', 'class', 'our-services-wrapper');
+      $classes = ['our-services-wrapper'];
+      if ($flip_layout) {
+        $classes[] = 'layout-flipped';
+      }
+      $this->set_attribute('_root', 'class', implode(' ', $classes));
     }
 
     $output = "<div {$this->render_attributes('_root')} data-instance-id=\"{$unique_id}\">";
@@ -325,6 +407,25 @@ class Element_Our_Services extends \Bricks\Element
         $output .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="service-main-image">';
       }
     }
+
+    // Description container (shown on click)
+    $active_description = '';
+    $is_description_active = false;
+    if ($active_service_index >= 0 && isset($services[$active_service_index]['description'])) {
+      $active_description = $services[$active_service_index]['description'];
+      $is_description_active = !empty($active_description);
+    }
+
+    // Always create description container (hidden by default if no description)
+    $description_class = $is_description_active ? 'service-description active' : 'service-description';
+    $output .= '<div class="' . esc_attr($description_class) . '" data-service-index="' . esc_attr($active_service_index >= 0 ? $active_service_index : '') . '">';
+    $output .= '<div class="service-description-content">';
+    if ($active_description) {
+      $output .= wp_kses_post($active_description);
+    }
+    $output .= '</div>'; // .service-description-content
+    $output .= '</div>'; // .service-description
+
     $output .= '</div>'; // .service-image-wrapper
 
     // Services list
@@ -338,6 +439,8 @@ class Element_Our_Services extends \Bricks\Element
 
     foreach ($services as $index => $service) {
       $service_title = ! empty($service['title']) ? $service['title'] : '';
+      $service_subtitle = ! empty($service['subtitle']) ? $service['subtitle'] : '';
+      $service_description = ! empty($service['description']) ? $service['description'] : '';
       $service_image = ! empty($service['image']) ? $service['image'] : '';
 
       if (! $service_title) {
@@ -374,14 +477,29 @@ class Element_Our_Services extends \Bricks\Element
         $output .= ' data-image-url="' . esc_url($service_image_url) . '"';
       }
 
+      if ($service_description) {
+        // Store description HTML in a data attribute (will be used by JS)
+        $output .= ' data-description-html="' . esc_attr(base64_encode($service_description)) . '"';
+      }
+
       $output .= '>';
 
       // Service number
       $service_number = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
       $output .= '<span class="service-number">' . esc_html($service_number) . '</span>';
 
+      // Service title and subtitle wrapper
+      $output .= '<div class="service-title-wrapper">';
+
       // Service title
       $output .= '<span class="service-title">' . esc_html($service_title) . '</span>';
+
+      // Service subtitle (small text under title)
+      if ($service_subtitle) {
+        $output .= '<span class="service-subtitle">' . esc_html($service_subtitle) . '</span>';
+      }
+
+      $output .= '</div>'; // .service-title-wrapper
 
       // Arrow icon
       $output .= '<span class="service-arrow">

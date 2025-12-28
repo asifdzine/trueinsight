@@ -108,13 +108,28 @@
 
 }
 
+.service-title-wrapper {
+    display       : flex;
+    flex-direction: column;
+    gap           : 4px;
+    flex          : 1;
+}
+
 .service-title {
     font-family   : 'Red Hat Display';
     font-weight   : 900;
     font-size     : 28px;
     line-height   : 42px;
     letter-spacing: 0px;
+}
 
+.service-subtitle {
+    font-family   : 'Red Hat Text';
+    font-weight   : 400;
+    font-size     : 14px;
+    line-height   : 20px;
+    color         : rgba(0, 53, 80, 0.7);
+    letter-spacing: 0px;
 }
 
 .service-arrow {
@@ -134,6 +149,28 @@
     transition: opacity 0.3s ease-in-out;
     width     : 100%;
     height    : auto;
+}
+
+.service-description {
+    display         : none;
+    margin-top      : 20px;
+    padding         : 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius   : 8px;
+    opacity         : 0;
+    transform       : translateY(-10px);
+    transition      : opacity 0.3s ease, transform 0.3s ease;
+}
+
+.service-description.active {
+    display  : block;
+    opacity  : 1;
+    transform: translateY(0);
+}
+
+.service-description-content {
+    color      : rgba(0, 53, 80, 0.8);
+    line-height: 1.6;
 }
 
 /* Mobile Styles - Image appears under active service */
@@ -198,6 +235,19 @@
     .services-list {
         order: 2;
         width: 50%;
+    }
+
+    /* Flipped Layout - Image on right, Services on left */
+    /* .layout-flipped .services-content-wrapper {
+        flex-direction: row-reverse;
+    } */
+
+    .layout-flipped .service-image-wrapper {
+        order: 2;
+    }
+
+    .layout-flipped .services-list {
+        order: 1;
     }
 
     /* Filtered Posts Element Styles */
