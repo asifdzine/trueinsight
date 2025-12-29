@@ -9,7 +9,6 @@
  Text Domain:  bricks
 */
 
-
 .spotlight-animation-container .bricks-background-primary {
     opacity  : 0;
     transform: translateY(30px);
@@ -26,7 +25,7 @@
 }
 
 .services-heading {
-    font-family   : 'Red Hat Display';
+    font-family   : "Red Hat Display";
     font-weight   : 800;
     font-style    : ExtraBold;
     font-size     : 40px;
@@ -35,7 +34,6 @@
     letter-spacing: 0px;
     color         : #003550;
     margin-bottom : 32px;
-
 }
 
 .services-content-wrapper {
@@ -98,14 +96,13 @@
 }
 
 .service-number {
-    font-family: 'Red Hat Text';
+    font-family: "Red Hat Text";
     font-weight: 600;
     font-style : SemiBold;
     font-size  : 18px;
 
     line-height   : 26px;
     letter-spacing: 0%;
-
 }
 
 .service-title-wrapper {
@@ -116,19 +113,10 @@
 }
 
 .service-title {
-    font-family   : 'Red Hat Display';
+    font-family   : "Red Hat Display";
     font-weight   : 900;
     font-size     : 28px;
     line-height   : 42px;
-    letter-spacing: 0px;
-}
-
-.service-subtitle {
-    font-family   : 'Red Hat Text';
-    font-weight   : 400;
-    font-size     : 14px;
-    line-height   : 20px;
-    color         : rgba(0, 53, 80, 0.7);
     letter-spacing: 0px;
 }
 
@@ -149,28 +137,6 @@
     transition: opacity 0.3s ease-in-out;
     width     : 100%;
     height    : auto;
-}
-
-.service-description {
-    display         : none;
-    margin-top      : 20px;
-    padding         : 20px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius   : 8px;
-    opacity         : 0;
-    transform       : translateY(-10px);
-    transition      : opacity 0.3s ease, transform 0.3s ease;
-}
-
-.service-description.active {
-    display  : block;
-    opacity  : 1;
-    transform: translateY(0);
-}
-
-.service-description-content {
-    color      : rgba(0, 53, 80, 0.8);
-    line-height: 1.6;
 }
 
 /* Mobile Styles - Image appears under active service */
@@ -235,19 +201,6 @@
     .services-list {
         order: 2;
         width: 50%;
-    }
-
-    /* Flipped Layout - Image on right, Services on left */
-    /* .layout-flipped .services-content-wrapper {
-        flex-direction: row-reverse;
-    } */
-
-    .layout-flipped .service-image-wrapper {
-        order: 2;
-    }
-
-    .layout-flipped .services-list {
-        order: 1;
     }
 
     /* Filtered Posts Element Styles */
@@ -612,6 +565,133 @@
             justify-content: center;
         }
     }
+}
+
+@media (max-width: 991px) {
+    .services-content-wrapper {
+        gap        : 50px;
+        align-items: center;
+    }
+
+    .service-title {
+        font-size  : 25px;
+        line-height: 25px;
+    }
+
+    .service-item {
+        padding: 20px 1.5rem;
+        gap    : 20px;
+    }
+}
+
+.pagination-number {
+    display         : inline-flex;
+    align-items     : center;
+    justify-content : center;
+    min-width       : 40px;
+    height          : 40px;
+    padding         : 0 12px;
+    background-color: transparent;
+    color           : rgba(255, 255, 255, 0.7);
+    border          : 1px solid rgba(255, 255, 255, 0.2);
+    border-radius   : 4px;
+    cursor          : pointer;
+    font-size       : 16px;
+    font-weight     : 600;
+    transition      : all 0.3s ease;
+}
+
+.pagination-number:hover {
+    background-color: rgba(0, 183, 195, 0.3);
+    color           : #ffffff;
+    border-color    : rgba(0, 183, 195, 0.5);
+}
+
+.pagination-number.active {
+    background-color: rgba(0, 183, 195, 0.8);
+    color           : #ffffff;
+    border-color    : rgba(0, 183, 195, 1);
+}
+
+.pagination-dots {
+    color    : rgba(255, 255, 255, 0.5);
+    padding  : 0 8px;
+    font-size: 16px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .filtered-posts-container {
+        flex-direction: column;
+    }
+
+    .filtered-posts-sidebar {
+        width        : 100%;
+        margin-bottom: 30px;
+    }
+
+    .filter-list {
+        flex-direction: row;
+        flex-wrap     : wrap;
+        gap           : 8px;
+    }
+
+    .filter-item {
+        margin-bottom: 0;
+    }
+
+    .post-card-image-wrapper {
+        width       : 100%;
+        height      : auto;
+        aspect-ratio: 472 / 265.5;
+    }
+
+    .post-card-image {
+        width : 100%;
+        height: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .filtered-posts-grid {
+        grid-template-columns: 1fr;
+        gap                  : 24px;
+    }
+
+    .post-card-image-wrapper {
+        width       : 100%;
+        height      : auto;
+        aspect-ratio: 472 / 265.5;
+    }
+
+    .post-card-image {
+        width : 100%;
+        height: 100%;
+    }
+
+    .post-card-title {
+        font-size: 20px;
+    }
+
+    .post-card-excerpt {
+        font-size: 14px;
+    }
+
+    .filtered-posts-pagination {
+        flex-direction: column;
+        gap           : 16px;
+    }
+
+    .filtered-posts-pagination>button {
+        width          : 100%;
+        justify-content: center;
+    }
+
+    .pagination-numbers {
+        width          : 100%;
+        justify-content: center;
+    }
+}
 }
 
 
