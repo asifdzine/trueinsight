@@ -139,6 +139,19 @@
     height    : auto;
 }
 
+.layout-flipped .services-content-wrapper {
+    /* flex-direction: row-reverse; */
+}
+
+.layout-flipped .service-image-wrapper {
+    order: 2;
+}
+
+.layout-flipped .services-list {
+    order: 1;
+}
+
+
 /* Mobile Styles - Image appears under active service */
 @media (max-width: 767px) {
     .services-content-wrapper {
@@ -692,7 +705,7 @@
         justify-content: center;
     }
 }
-}
+
 
 
 .pin {
