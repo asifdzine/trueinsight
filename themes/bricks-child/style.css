@@ -95,6 +95,10 @@
   opacity: 1;
 }
 
+.service-item:hover .service-arrow {
+  opacity: 1;
+}
+
 .service-number {
   font-family: "Red Hat Text";
   font-weight: 600;
@@ -127,10 +131,6 @@
   margin-left: auto;
   display: flex;
   opacity: 0;
-}
-
-.service-item:hover .service-arrow {
-  transform: translateX(5px);
 }
 
 .service-main-image {
