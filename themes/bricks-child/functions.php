@@ -27,6 +27,15 @@ add_action('wp_enqueue_scripts', function () {
 		'ajaxUrl' => admin_url('admin-ajax.php'),
 		'nonce'   => wp_create_nonce('filtered_posts_nonce'),
 	]);
+
+	// Register Featured Posts Carousel script
+	wp_register_script(
+		'featured-posts-carousel-script',
+		get_stylesheet_directory_uri() . '/js/featured-posts-carousel.js',
+		[],
+		filemtime(get_stylesheet_directory() . '/js/featured-posts-carousel.js'),
+		true
+	);
 }, 5);
 
 /**
@@ -47,6 +56,7 @@ add_action('init', function () {
 		__DIR__ . '/elements/title.php',
 		__DIR__ . '/elements/our-services.php',
 		__DIR__ . '/elements/filtered-posts.php',
+		__DIR__ . '/elements/featured-posts-carousel.php',
 	];
 
 	foreach ($element_files as $file) {
