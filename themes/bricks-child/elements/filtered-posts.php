@@ -747,25 +747,26 @@ class Element_Filtered_Posts extends \Bricks\Element
         // Category tag (before title)
         if ($show_category) {
           $post_terms = wp_get_post_terms($post_id, $taxonomy);
+
           if (!empty($post_terms) && !is_wp_error($post_terms)) {
             $first_term = $post_terms[0];
 
-            // Render dynamic data in category label
-            $rendered_label = bricks_render_dynamic_data($category_label, $post_id, 'text');
-
-            // If dynamic data tag was used and rendered, use it; otherwise use the label as-is
-            // If the label contains {post_terms_category} or similar, it will be replaced
-            if (strpos($category_label, '{') !== false && $rendered_label !== $category_label) {
-              // Strip HTML tags to get only the text (in case dynamic data returns HTML with links)
-              $category_display = wp_strip_all_tags($rendered_label);
+            // If user uses dynamic tag, respect it
+            if (strpos($category_label, '{') !== false) {
+              $category_display = wp_strip_all_tags(
+                bricks_render_dynamic_data($category_label, $post_id, 'text')
+              );
             } else {
-              // Use the first term name if label is empty or use label as fallback
-              $category_display = !empty($rendered_label) ? wp_strip_all_tags($rendered_label) : $first_term->name;
+              // Default: show actual term name
+              $category_display = $first_term->name;
             }
 
-            $output .= '<span class="post-card-category">' . esc_html($category_display) . '</span>';
+            $output .= '<span class="post-card-category">'
+              . esc_html($category_display)
+              . '</span>';
           }
         }
+
 
         // Title
         $output .= '<h3 class="post-card-title">';

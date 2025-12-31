@@ -8,73 +8,68 @@
     const wrappers = document.querySelectorAll('.filtered-posts-wrapper');
 
     wrappers.forEach(wrapper => {
+
+      // Prevent double initialization (important for Bricks)
+      if (wrapper.dataset.fpReady === '1') return;
+      wrapper.dataset.fpReady = '1';
+
       const instanceId = wrapper.getAttribute('data-instance-id');
       const postType = wrapper.getAttribute('data-post-type') || 'post';
       const taxonomy = wrapper.getAttribute('data-taxonomy') || 'category';
       const postsPerPage = parseInt(wrapper.getAttribute('data-posts-per-page')) || 6;
       const settings = JSON.parse(wrapper.getAttribute('data-settings') || '{}');
 
-      // Filter items
       const filterItems = wrapper.querySelectorAll('.filter-item');
       const postsGrid = wrapper.querySelector('.filtered-posts-grid');
-      const pagination = wrapper.querySelector('.filtered-posts-pagination');
+      const contentArea = wrapper.querySelector('.filtered-posts-content');
 
-      // Handle filter clicks
+      // --- READ INITIAL STATE FROM URL ---
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialCategory = urlParams.get('fp_category') || '0';
+      const initialPage = parseInt(urlParams.get('fp_page')) || 1;
+
+      // --- SET ACTIVE FILTER ---
+      filterItems.forEach(item => {
+        item.classList.toggle(
+          'active',
+          item.getAttribute('data-category') === initialCategory
+        );
+      });
+
+      // --- FILTER CLICK HANDLER ---
       filterItems.forEach(item => {
         item.addEventListener('click', function (e) {
           e.preventDefault();
 
           const categoryId = this.getAttribute('data-category');
 
-          // Update active state
           filterItems.forEach(fi => fi.classList.remove('active'));
           this.classList.add('active');
 
-          // Load posts via AJAX
-          loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, 1, settings);
+          loadFilteredPosts(
+            wrapper,
+            instanceId,
+            postType,
+            taxonomy,
+            postsPerPage,
+            categoryId,
+            1,
+            settings
+          );
         });
       });
 
-      // Handle pagination clicks
-      if (pagination) {
-        const prevBtn = pagination.querySelector('.pagination-prev:not(.disabled)');
-        const nextBtn = pagination.querySelector('.pagination-next:not(.disabled)');
-        const pageNumbers = pagination.querySelectorAll('.pagination-number');
-
-        if (prevBtn) {
-          prevBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const page = parseInt(this.getAttribute('data-page')) || 1;
-            const activeFilter = wrapper.querySelector('.filter-item.active');
-            const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
-
-            loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
-          });
-        }
-
-        if (nextBtn) {
-          nextBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const page = parseInt(this.getAttribute('data-page')) || 1;
-            const activeFilter = wrapper.querySelector('.filter-item.active');
-            const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
-
-            loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
-          });
-        }
-
-        // Handle page number clicks
-        pageNumbers.forEach(btn => {
-          btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const page = parseInt(this.getAttribute('data-page')) || 1;
-            const activeFilter = wrapper.querySelector('.filter-item.active');
-            const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
-
-            loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
-          });
-        });
-      }
+      // --- INITIAL AJAX LOAD (IMPORTANT FIX) ---
+      loadFilteredPosts(
+        wrapper,
+        instanceId,
+        postType,
+        taxonomy,
+        postsPerPage,
+        initialCategory,
+        initialPage,
+        settings
+      );
     });
   }
 
@@ -86,13 +81,12 @@
     const contentArea = wrapper.querySelector('.filtered-posts-content');
     let pagination = wrapper.querySelector('.filtered-posts-pagination');
 
-    // Show loading state
-    if (postsGrid) {
-      postsGrid.style.opacity = '0.5';
-      postsGrid.style.pointerEvents = 'none';
-    }
+    if (!postsGrid) return;
 
-    // Build request data
+    // Loading state
+    postsGrid.style.opacity = '0.5';
+    postsGrid.style.pointerEvents = 'none';
+
     const formData = new FormData();
     formData.append('action', 'filtered_posts_load');
     formData.append('instance_id', instanceId);
@@ -104,133 +98,97 @@
     formData.append('settings', JSON.stringify(settings));
     formData.append('nonce', filteredPostsData.nonce);
 
-    // Make AJAX request
     fetch(filteredPostsData.ajaxUrl, {
       method: 'POST',
       body: formData
     })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          // Update posts grid
-          if (postsGrid && data.data.html) {
-            postsGrid.innerHTML = data.data.html;
-          }
+        if (!data.success) return;
 
-          // Update pagination
-          const shouldShowPagination = data.data.pagination && data.data.pagination.trim() !== '';
+        // Update posts
+        postsGrid.innerHTML = data.data.html || '';
 
-          if (shouldShowPagination) {
-            // Pagination should be shown - create or update element
-            if (!pagination && contentArea) {
-              // Create pagination element if it doesn't exist
-              pagination = document.createElement('div');
-              pagination.className = 'filtered-posts-pagination';
-              contentArea.appendChild(pagination);
-            }
+        // Handle pagination
+        const hasPagination = data.data.pagination && data.data.pagination.trim() !== '';
 
-            if (pagination) {
-              pagination.innerHTML = data.data.pagination;
-              // Re-attach pagination event listeners
-              attachPaginationListeners(wrapper, instanceId, postType, taxonomy, postsPerPage, settings);
-            }
-          } else {
-            // Pagination should be hidden - remove element if it exists
-            if (pagination) {
-              pagination.remove();
-            }
+        if (hasPagination) {
+          if (!pagination) {
+            pagination = document.createElement('div');
+            pagination.className = 'filtered-posts-pagination';
+            contentArea.appendChild(pagination);
           }
-
-          // Update URL without page reload
-          const url = new URL(window.location);
-          if (categoryId === '0') {
-            url.searchParams.delete('fp_category');
-          } else {
-            url.searchParams.set('fp_category', categoryId);
-          }
-          if (page === 1) {
-            url.searchParams.delete('fp_page');
-          } else {
-            url.searchParams.set('fp_page', page);
-          }
-          window.history.pushState({}, '', url);
-
-          // Scroll to top of grid
-          if (postsGrid) {
-            postsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        } else {
-          console.error('Error loading posts:', data.data);
+          pagination.innerHTML = data.data.pagination;
+          attachPaginationListeners(wrapper, instanceId, postType, taxonomy, postsPerPage, settings);
+        } else if (pagination) {
+          pagination.remove();
         }
+
+        // Update URL
+        const url = new URL(window.location);
+        categoryId === '0'
+          ? url.searchParams.delete('fp_category')
+          : url.searchParams.set('fp_category', categoryId);
+
+        page === 1
+          ? url.searchParams.delete('fp_page')
+          : url.searchParams.set('fp_page', page);
+
+        window.history.pushState({}, '', url);
+
+        postsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
       })
-      .catch(error => {
-        console.error('AJAX error:', error);
-      })
+      .catch(err => console.error('Filtered posts AJAX error:', err))
       .finally(() => {
-        // Remove loading state
-        if (postsGrid) {
-          postsGrid.style.opacity = '1';
-          postsGrid.style.pointerEvents = 'auto';
-        }
+        postsGrid.style.opacity = '1';
+        postsGrid.style.pointerEvents = 'auto';
       });
   }
 
   /**
-   * Attach pagination event listeners
+   * Pagination listeners
    */
   function attachPaginationListeners(wrapper, instanceId, postType, taxonomy, postsPerPage, settings) {
     const pagination = wrapper.querySelector('.filtered-posts-pagination');
     if (!pagination) return;
 
-    const prevBtn = pagination.querySelector('.pagination-prev:not(.disabled)');
-    const nextBtn = pagination.querySelector('.pagination-next:not(.disabled)');
-    const pageNumbers = pagination.querySelectorAll('.pagination-number');
+    const buttons = pagination.querySelectorAll('button');
 
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        const page = parseInt(this.getAttribute('data-page')) || 1;
-        const activeFilter = wrapper.querySelector('.filter-item.active');
-        const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
-
-        loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        const page = parseInt(this.getAttribute('data-page')) || 1;
-        const activeFilter = wrapper.querySelector('.filter-item.active');
-        const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
-
-        loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
-      });
-    }
-
-    // Handle page number clicks
-    pageNumbers.forEach(btn => {
+    buttons.forEach(btn => {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
+        if (this.classList.contains('disabled')) return;
+
         const page = parseInt(this.getAttribute('data-page')) || 1;
         const activeFilter = wrapper.querySelector('.filter-item.active');
         const categoryId = activeFilter ? activeFilter.getAttribute('data-category') : '0';
 
-        loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings);
+        loadFilteredPosts(
+          wrapper,
+          instanceId,
+          postType,
+          taxonomy,
+          postsPerPage,
+          categoryId,
+          page,
+          settings
+        );
       });
     });
   }
 
-  // Initialize on DOM ready
+  // DOM Ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initFilteredPosts);
   } else {
     initFilteredPosts();
   }
 
-  // Re-initialize after AJAX content loads (for Bricks builder)
+  // Bricks live editor support
   if (typeof window.bricksData !== 'undefined') {
-    document.addEventListener('bricks/ajax/query_result/displayed', initFilteredPosts);
+    document.addEventListener(
+      'bricks/ajax/query_result/displayed',
+      initFilteredPosts
+    );
   }
 })();
-
