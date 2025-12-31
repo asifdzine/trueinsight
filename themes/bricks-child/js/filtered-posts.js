@@ -54,7 +54,8 @@
             postsPerPage,
             categoryId,
             1,
-            settings
+            settings,
+            false // <-- user-triggered load
           );
         });
       });
@@ -68,7 +69,8 @@
         postsPerPage,
         initialCategory,
         initialPage,
-        settings
+        settings,
+        true // <-- first load, no scroll
       );
     });
   }
@@ -76,7 +78,7 @@
   /**
    * Load filtered posts via AJAX
    */
-  function loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings) {
+  function loadFilteredPosts(wrapper, instanceId, postType, taxonomy, postsPerPage, categoryId, page, settings, firstLoad = false) {
     const postsGrid = wrapper.querySelector('.filtered-posts-grid');
     const contentArea = wrapper.querySelector('.filtered-posts-content');
     let pagination = wrapper.querySelector('.filtered-posts-pagination');
@@ -136,7 +138,10 @@
 
         window.history.pushState({}, '', url);
 
-        postsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Only scroll if NOT first load
+        if (!firstLoad) {
+          postsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       })
       .catch(err => console.error('Filtered posts AJAX error:', err))
       .finally(() => {
@@ -171,7 +176,8 @@
           postsPerPage,
           categoryId,
           page,
-          settings
+          settings,
+          false // <-- user-triggered load
         );
       });
     });
