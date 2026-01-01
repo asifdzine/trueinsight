@@ -1003,6 +1003,10 @@
   z-index: -1;
 }
 
+.primary-btn::after {
+  background: #001d2c;
+}
+
 .primary-btn:hover::after,
 .secondary-btn:hover::after {
   transform: scale(3) translateY(0);
