@@ -31,29 +31,33 @@
             const prevBtn = wrapper.querySelector('.image-carousel-prev');
             const nextBtn = wrapper.querySelector('.image-carousel-next');
 
+            // Get gap from CSS variable or use default
+            const gapValue = getComputedStyle(carousel).getPropertyValue('--swiper-slide-gap') || '48px';
+            const spaceBetween = parseInt(gapValue) || 48;
+
             // Swiper configuration
             const swiperConfig = {
-                slidesPerView: 1, // Default for mobile
-                spaceBetween: 20,
+                slidesPerView: 'auto', // Auto width based on image content
+                spaceBetween: spaceBetween,
                 navigation: {
                     nextEl: nextBtn,
                     prevEl: prevBtn,
                 },
                 breakpoints: {
-                    // Mobile: 1 slide
+                    // Mobile: auto width
                     320: {
-                        slidesPerView: 1,
-                        spaceBetween: 20,
+                        slidesPerView: 'auto',
+                        spaceBetween: 48,
                     },
-                    // Tablet: 2-3 slides
+                    // Tablet: auto width
                     768: {
-                        slidesPerView: 2,
-                        spaceBetween: 20,
+                        slidesPerView: 'auto',
+                        spaceBetween: 48,
                     },
-                    // Desktop: 5 slides
+                    // Desktop: auto width (shows as many as fit)
                     1024: {
-                        slidesPerView: 5,
-                        spaceBetween: 20,
+                        slidesPerView: 'auto',
+                        spaceBetween: 48,
                     },
                 },
                 speed: 500,

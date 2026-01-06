@@ -152,7 +152,7 @@ class Element_Image_Carousel extends \Bricks\Element
                     'selector' => '.image-carousel-swiper',
                 ],
             ],
-            'default' => '20px',
+            'default' => '48px',
         ];
 
 
@@ -219,7 +219,7 @@ class Element_Image_Carousel extends \Bricks\Element
         $images = !empty($settings['images']) ? $settings['images'] : [];
         $image_size = !empty($settings['imageSize']) ? $settings['imageSize'] : 'large';
         $image_link = isset($settings['imageLink']) ? $settings['imageLink'] : false;
-        $show_navigation = isset($settings['showNavigation']) ? $settings['showNavigation'] : true;
+        $show_navigation = isset($settings['showNavigation']) ? $settings['showNavigation'] : false;
         $show_pagination = isset($settings['showPagination']) ? $settings['showPagination'] : false;
         $autoplay = isset($settings['autoplay']) ? $settings['autoplay'] : false;
         $autoplay_delay = !empty($settings['autoplayDelay']) ? intval($settings['autoplayDelay']) : 3000;
@@ -282,15 +282,11 @@ class Element_Image_Carousel extends \Bricks\Element
 
                     $output .= '<div class="swiper-slide image-carousel-slide">';
 
-                    if ($image_link) {
-                        $output .= '<a href="' . esc_url($image_full_url) . '" class="image-carousel-link" data-lightbox="image-carousel-' . esc_attr($unique_id) . '">';
-                    }
+                  
 
                     $output .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($image_alt) . '" class="image-carousel-image">';
 
-                    if ($image_link) {
-                        $output .= '</a>';
-                    }
+                   
 
                     $output .= '</div>'; // .swiper-slide
                 }
