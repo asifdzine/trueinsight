@@ -996,7 +996,7 @@
 .primary-btn::after,
 .secondary-btn::after {
   content: "";
-  position: absolute;
+  position: absolute;   
   top: 50%;
   left: 50%;
   width: 20px;
@@ -1027,6 +1027,7 @@
     padding: 0px;
   }
 }
+
 
 /* Image Carousel Element Styles */
 .image-carousel-wrapper,
