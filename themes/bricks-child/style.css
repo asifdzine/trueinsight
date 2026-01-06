@@ -996,7 +996,7 @@
 .primary-btn::after,
 .secondary-btn::after {
   content: "";
-  position: absolute;   
+  position: absolute;
   top: 50%;
   left: 50%;
   width: 20px;
@@ -1027,7 +1027,6 @@
     padding: 0px;
   }
 }
-
 
 /* Image Carousel Element Styles */
 .image-carousel-wrapper,
@@ -1174,4 +1173,54 @@
   .image-carousel-nav-button::after {
     font-size: 14px !important;
   }
+}
+
+.resources-styling .input,
+input:not([type="submit"]),
+select,
+textarea {
+  background: #ffffff;
+  padding: 12px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  font-family: "Red Hat Text";
+  color: #003550;
+}
+.resources-styling .input::placeholder,
+input:not([type="submit"])::placeholder,
+textarea::placeholder {
+  color: #777777;
+  text-transform: capitalize;
+}
+
+.resources-styling ._submit {
+  background-color: #003550;
+  color: #ffffff;
+  font-family: "Red Hat Text";
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  transition: all 0.3 ease-in-out;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+}
+
+.resources-styling ._submit:hover {
+  background-color: #001d2c;
+  color: #00bbaf;
 }
