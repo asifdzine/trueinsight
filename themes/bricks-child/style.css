@@ -1048,6 +1048,7 @@
 .image-carousel-swiper .swiper-wrapper {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
 }
 
 .image-carousel-slide {
@@ -1227,27 +1228,27 @@ textarea::placeholder {
 
 .tooltip,
 .custom-map-tooltip {
-    position: absolute;
-    background-color: #333;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;  
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 9999;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    white-space: nowrap;
-    text-transform: uppercase;
+  position: absolute;
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  text-transform: uppercase;
 }
 
 .tooltip.show {
-    opacity: 1;
+  opacity: 1;
 }
 
 /* Add cursor pointer to elements with data-title */
 [data-title] {
-    cursor: pointer;
+  cursor: pointer;
 }
